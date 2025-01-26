@@ -130,7 +130,7 @@ check-poetry:
 		exit 1; \
 	fi
 
-install-deploy-dependencies:
+install-deploy-python-dependencies:
 	@echo "$(GREEN)Installing Python dependencies...$(RESET)"
 	@if [ -z "${TZ}" ]; then \
 		echo "Defaulting TZ (timezone) to UTC"; \
