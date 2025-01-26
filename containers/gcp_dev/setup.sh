@@ -161,11 +161,11 @@ main() {
     sudo usermod -aG docker harshith2794
     sudo usermod -aG docker dinkarjuyal
     # Export the function to the environment so it can be recognized in new shell
-    export -f pull_runtime_image
+    # export -f pull_runtime_image
 
     # Use newgrp to run pull_runtime_image with the new group permissions
-    newgrp docker <<EOF
-        pull_runtime_image
+    # newgrp docker <<EOF
+    #     pull_runtime_image
 EOF
     log "Setup completed successfully!"
 }
