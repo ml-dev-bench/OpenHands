@@ -20,6 +20,15 @@ BLUE=$(shell tput -Txterm setaf 6)
 RESET=$(shell tput -Txterm sgr0)
 
 # Build
+deploy-build:
+	@echo "$(GREEN)Building project...$(RESET)"
+	@$(MAKE) -s check-dependencies
+	@$(MAKE) -s install-deploy-python-dependencies
+	@$(MAKE) -s install-frontend-dependencies
+	@$(MAKE) -s build-frontend
+	@echo "$(GREEN)Build completed successfully.$(RESET)"
+
+# Build
 build:
 	@echo "$(GREEN)Building project...$(RESET)"
 	@$(MAKE) -s check-dependencies
@@ -120,6 +129,36 @@ check-poetry:
 		echo "$(RED)More detail here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
 		exit 1; \
 	fi
+
+install-deploy-dependencies:
+	@echo "$(GREEN)Installing Python dependencies...$(RESET)"
+	@if [ -z "${TZ}" ]; then \
+		echo "Defaulting TZ (timezone) to UTC"; \
+		export TZ="UTC"; \
+	fi
+	poetry env use python$(PYTHON_VERSION)
+	@if [ "$(shell uname)" = "Darwin" ]; then \
+		echo "$(BLUE)Installing chroma-hnswlib...$(RESET)"; \
+		export HNSWLIB_NO_NATIVE=1; \
+		poetry run pip install chroma-hnswlib; \
+	fi
+	@poetry install --without llama-index,runtime,dev,evaluation,test
+	@if [ -f "/etc/manjaro-release" ]; then \
+		echo "$(BLUE)Detected Manjaro Linux. Installing Playwright dependencies...$(RESET)"; \
+		poetry run pip install playwright; \
+		poetry run playwright install chromium; \
+	else \
+		if [ ! -f cache/playwright_chromium_is_installed.txt ]; then \
+			echo "Running playwright install --with-deps chromium..."; \
+			poetry run playwright install --with-deps chromium; \
+			mkdir -p cache; \
+			touch cache/playwright_chromium_is_installed.txt; \
+		else \
+			echo "Setup already done. Skipping playwright installation."; \
+		fi \
+	fi
+	@echo "$(GREEN)Python dependencies installed successfully.$(RESET)"
+
 
 install-python-dependencies:
 	@echo "$(GREEN)Installing Python dependencies...$(RESET)"

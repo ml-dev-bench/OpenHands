@@ -99,12 +99,12 @@ clone_repository() {
     sudo chmod g+s ${APP_BASE_DIR}  # Optional
     cd "${APP_BASE_DIR}"
 
-    git config --global user.name "${GITHUB_USER}"
-    git config --global user.email "${GITHUB_EMAIL}"
+    # git config --global user.name "${GITHUB_USER}"
+    # git config --global user.email "${GITHUB_EMAIL}"
     git config --global credential.helper cache
 
-    git clone "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
-
+    # git clone "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
+    git clone "https://github.com/${GITHUB_REPO}.git"
     cd "$(basename "${GITHUB_REPO}")"
     git checkout "${GITHUB_BRANCH}"
 }
