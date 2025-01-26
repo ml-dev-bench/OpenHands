@@ -113,8 +113,19 @@ clone_repository() {
 pull_runtime_image() {
     log "Configuring Docker for GCP..."
     gcloud auth configure-docker
-    docker pull gcr.io/ml-dev-bench/ml-dev-bench-runtime:latest
-    docker tag gcr.io/ml-dev-bench/ml-dev-bench-runtime:latest ml-dev-bench-runtime:latest
+    docker pull gcr.io/deduction-poc/ml-dev-bench-runtime:latest
+    docker tag gcr.io/deduction-poc/ml-dev-bench-runtime:latest ml-dev-bench-runtime:latest
+}
+
+push_runtime_image() {
+    log "Pushing runtime image..."
+    poetry run python3 openhands/runtime/utils/runtime_build.py --base_image nikolaik/python-nodejs:python3.12-nodejs22 --build_folder containers/runtime
+    # replace all instances of ./code/ with empty string
+    sed -i 's/.\/code\//\//g' containers/runtime/Dockerfile
+    docker build -t ml-dev-bench-runtime:latest -f containers/runtime/Dockerfile .
+    gcloud auth configure-docker
+    docker tag ml-dev-bench-runtime:latest gcr.io/deduction-poc/ml-dev-bench-runtime:latest
+    docker push gcr.io/deduction-poc/ml-dev-bench-runtime:latest
 }
 
 # Main setup function
@@ -155,17 +166,17 @@ main() {
     # # Run build command
     make deploy-build
 
-
     sudo systemctl start docker
     sudo systemctl enable docker
     sudo usermod -aG docker harshith2794
     sudo usermod -aG docker dinkarjuyal
     # Export the function to the environment so it can be recognized in new shell
-    # export -f pull_runtime_image
+    export -f pull_runtime_image
+    export -f push_runtime_image
 
     # Use newgrp to run pull_runtime_image with the new group permissions
-    # newgrp docker <<EOF
-    #     pull_runtime_image
+    newgrp docker <<EOF
+        pull_runtime_image
 EOF
     log "Setup completed successfully!"
 }
