@@ -7,7 +7,7 @@ PYTHON_VERSION="3.12"
 CONDA_INSTALL_DIR="/opt/conda"
 # Repository Configuration
 GITHUB_REPO="ml-dev-bench/OpenHands"
-GITHUB_BRANCH="ml-dev-bench"
+GITHUB_BRANCH="ml-dev-bench-v0.21.1"
 
 # Workspace and Application Configuration
 APP_BASE_DIR="/app/"
